@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface JuegoRepository extends MongoRepository<Juego, String> {
     Optional<Juego> findById(String id);
+
+    Optional<Juego> findByIdJugador(String idJugador);
 }

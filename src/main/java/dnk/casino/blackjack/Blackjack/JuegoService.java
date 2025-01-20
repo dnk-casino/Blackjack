@@ -16,9 +16,18 @@ public class JuegoService {
     }
 
     public Juego crearJuego(String idJugador) {
-        Juego juego = new Juego(idJugador);
-        juego.iniciarJuego();
-        return juegoRepository.save(juego);
+        Optional<Juego> juegoOpt = juegoRepository.findByIdJugador(idJugador);
+        if (!juegoOpt.isPresent()) {
+            if (!juegoOpt.get().isActivo()) {
+                Juego juego = new Juego(idJugador);
+                juego.iniciarJuego();
+                return juegoRepository.save(juego);
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
     public Juego pedirCarta(String id) {
