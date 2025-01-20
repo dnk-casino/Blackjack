@@ -112,6 +112,12 @@ public class UsuarioService {
         return usuarioRepository.save(user);
     }
 
+    public Usuario bjvictoria(String id) {
+        Usuario user = usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        user.bjvictoria();
+        return usuarioRepository.save(user);
+    }
+
     public List<Usuario> getTop5Winners() {
         List<Usuario> usuarios = getAllUsers();
 

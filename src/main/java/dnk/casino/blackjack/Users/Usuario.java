@@ -19,6 +19,7 @@ public class Usuario {
     private Rol rol;
     private int coins;
     private int wins;
+    private int bjwins;
     private Set<String> skins;
     private Date lastLoginDate;
     private String tokenRestablecimientoContrasena;
@@ -102,6 +103,14 @@ public class Usuario {
         this.wins = wins;
     }
 
+    public int getBjwins() {
+        return bjwins;
+    }
+
+    public void setBjwins(int bjwins) {
+        this.bjwins = bjwins;
+    }
+
     public Set<String> getSkins() {
         return skins;
     }
@@ -155,5 +164,9 @@ public class Usuario {
 
     public void victoria() {
         wins++;
+    }
+
+    public void bjvictoria() {
+        bjwins++;
     }
 }
