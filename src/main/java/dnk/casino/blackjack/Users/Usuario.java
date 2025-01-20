@@ -35,6 +35,7 @@ public class Usuario {
         this.rol = Rol.ROLE_USER;
         this.coins = 0;
         this.wins = 0;
+        this.bjwins = 0;
         this.skins = new HashSet<>();
         this.lastLoginDate = new Date(0);
         this.tokenRestablecimientoContrasena = null;
