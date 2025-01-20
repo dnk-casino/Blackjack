@@ -26,7 +26,7 @@ h1 {
   margin-bottom: 20px;
 }
 
-.slot-machine {
+.juego {
   width: 30%;
   margin: 40px auto;
   text-align: center;
@@ -70,23 +70,23 @@ button {
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
-.slot-machine .buttons {
+.juego .buttons {
   gap: 1em;
 }
 
-.slot-machine .buttons button {
+.juego .buttons button {
   width: 33%;
 }
 
-.slot-machine .buttons.extra-buttons *:first-child {
+.juego .buttons.extra-buttons *:first-child {
   width: 50%;
 }
 
-.slot-machine .buttons.extra-buttons * {
+.juego .buttons.extra-buttons * {
   width: 30%;
 }
 
-.slot-machine .extra-buttons *:last-child {
+.juego .extra-buttons *:last-child {
   width: 20%;
 }
 
@@ -296,7 +296,7 @@ select option {
     font-size: 500%;
   }
 
-  .slot-machine,
+  .juego,
   #ranking-panel,
   #premios-panel {
     width: 80%;

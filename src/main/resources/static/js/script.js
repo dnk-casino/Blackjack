@@ -11,6 +11,100 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutButton = document.getElementById('logout-button');
     const authSectionTitle = document.getElementById('auth-section-title');
     const skinSelect = document.getElementById('skin');
+    // Blackjack
+    const manoJugador = document.getElementById('mano-jugador');
+    const valorJugador = document.getElementById('valor-jugador');
+    const manoIA = document.getElementById('mano-ia');
+    const valorIA = document.getElementById('valor-ia');
+    const resultado = document.getElementById('resultado');
+    const pedirCarta = document.getElementById('pedir-carta');
+    const plantarse = document.getElementById('plantarse');
+
+    let jugador = {
+        mano: [],
+        valor: 0
+    };
+
+    let ia = {
+        mano: [],
+        valor: 0
+    };
+
+    pedirCarta.addEventListener('click', () => {
+        // Pedir carta al jugador
+        const carta = obtenerCarta();
+        jugador.mano.push(carta);
+        jugador.valor = calcularValor(jugador.mano);
+        manoJugador.textContent = jugador.mano.map(carta => {
+            switch (carta.palo) {
+                case 'Corazones':
+                    return carta.valor + '♥️';
+                case 'Diamantes':
+                    return carta.valor + '♦️';
+                case 'Picas':
+                    return carta.valor + '♠️';
+                case 'Tréboles':
+                    return carta.valor + '♣️';
+                default:
+                    return '';
+            }
+        }).join(',');
+        valorJugador.textContent = jugador.valor;
+        if (jugador.valor > 21) {
+            resultado.textContent = 'Jugador pierde';
+        }
+    });
+
+    plantarse.addEventListener('click', () => {
+        // Plantarse
+        resultado.textContent = 'Jugador se planta';
+        // Pedir cartas a la IA
+        while (ia.valor < 17) {
+            const carta = obtenerCarta();
+            ia.mano.push(carta);
+            ia.valor = calcularValor(ia.mano);
+        }
+        manoIA.textContent = ia.mano.join(', ');
+        valorIA.textContent = ia.valor;
+        if (ia.valor > 21) {
+            resultado.textContent = 'IA pierde';
+        } else if (ia.valor > jugador.valor) {
+            resultado.textContent = 'IA gana';
+        } else if (ia.valor < jugador.valor) {
+            resultado.textContent = 'Jugador gana';
+        } else {
+            resultado.textContent = 'Empate';
+        }
+    });
+
+    function obtenerCarta() {
+        const palos = ['Corazones', 'Diamantes', 'Picas', 'Tréboles'];
+        const valores = ['As', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+        const palo = palos[Math.floor(Math.random() * palos.length)];
+        const valor = valores[Math.floor(Math.random() * valores.length)];
+        return { palo, valor };
+    }
+
+    function calcularValor(mano) {
+        let valor = 0;
+        let numAses = 0;
+        for (const carta of mano) {
+            if (carta.valor === 'As') {
+                numAses++;
+                valor += 11;
+            } else if (carta.valor === 'J' || carta.valor === 'Q' || carta.valor === 'K') {
+                valor += 10;
+            } else {
+                valor += parseInt(carta.valor);
+            }
+        }
+        while (valor > 21 && numAses > 0) {
+            valor -= 10;
+            numAses--;
+        }
+        return valor;
+    }
+    // Fin Blackjack
 
     const toggleSections = () => {
         if (!!localStorage.getItem('token')) {
