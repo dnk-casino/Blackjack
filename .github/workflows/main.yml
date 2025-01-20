@@ -1,0 +1,71 @@
+name: Build and Deploy Spring Boot Docker Image
+
+on:
+  push:
+    branches:
+      - main
+  release:
+    types: [published]
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Paso 1: Checkout del código fuente
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Paso 2: Configurar Java (si es necesario)
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      # Paso 3: Configurar Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Paso 4: Loguearse en DockerHub
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      # Paso 5: Construir la imagen usando Spring Boot Build Image
+      - name: Build Docker image with Spring Boot plugin
+        #run: ./mvnw spring-boot:build-image -DskipTests
+        run: |
+          docker build -t blackjack .
+
+      # Paso 6: Etiquetar la imagen (si es necesario)
+      - name: Tag Docker image
+        run: |
+          docker tag blackjack:latest danikileitor/dnk-casino:blackjack
+
+      # Paso 7: Subir la imagen a DockerHub
+      - name: Push Docker image to DockerHub
+        run: |
+          docker push danikileitor/dnk-casino:blackjack
+
+  Deploy-Render:
+    needs: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      # Paso 1: Instalar Render CLI
+      - name: Install Render CLI
+        run: |
+          curl -L https://github.com/render-oss/cli/releases/download/v1.1.0/cli_1.1.0_linux_amd64.zip -o render.zip
+          unzip render.zip
+          sudo mv cli_v1.1.0 /usr/local/bin/render
+
+      # Paso 2: Lanzar Deploy con Render CLI
+      - name: Trigger deploy with Render CLI
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          CI: true
+        run: |
+          render deploys create ${{ secrets.RENDER_SERVICE_ID }} --output json --confirm
