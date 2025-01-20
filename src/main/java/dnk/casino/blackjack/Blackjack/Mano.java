@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import dnk.casino.blackjack.Blackjack.Carta.Carta;
+import dnk.casino.blackjack.Blackjack.Carta.Valor;
+
 @Component
 public class Mano {
     private List<Carta> cartas;
@@ -21,11 +24,11 @@ public class Mano {
         int valorTotal = 0;
         int numAses = 0;
         for (Carta carta : cartas) {
-            if (carta.getValor().equals("As")) {
+            if (carta.getValor().equals(Valor.AS)) {
                 numAses++;
                 valorTotal += 11;
             } else {
-                valorTotal += carta.getValorNumerico(false);
+                valorTotal += carta.getValorNumerico();
             }
         }
         while (valorTotal > 21 && numAses > 0) {

@@ -71,10 +71,20 @@ public class BlackjackController {
         return "Carta pedida para la IA";
     }
 
-    @GetMapping("/determinar-ganador")
-    public String determinarGanador() {
-        juego.determinarGanador();
-        return "Ganador determinado";
+    @PostMapping(value = "/determinar-ganador", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<Integer> determinarGanador(@RequestHeader("Authorization") String token) {
+        Optional<String> usernameOpt = JwtTokenUtil.extractUsernameFromToken(token);
+        if (usernameOpt.isPresent()) {
+            Optional<Usuario> usuarioOpt = usuarioService.findByUsername(usernameOpt.get());
+            if (usuarioOpt.isPresent()) {
+                return ResponseEntity.ok(juego.determinarGanador());
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
     @PostMapping(value = "/coins", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

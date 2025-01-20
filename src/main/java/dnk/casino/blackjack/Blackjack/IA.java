@@ -2,6 +2,8 @@ package dnk.casino.blackjack.Blackjack;
 
 import org.springframework.stereotype.Component;
 
+import dnk.casino.blackjack.Blackjack.Carta.Carta;
+
 @Component
 public class IA {
     private Mano mano;
@@ -25,5 +27,13 @@ public class IA {
         } else {
             return false;
         }
+    }
+
+    public Mano getMano() {
+        return mano;
+    }
+
+    public void setMano(Mano mano) {
+        this.mano = mano;
     }
 }
