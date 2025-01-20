@@ -5,8 +5,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import dnk.casino.blackjack.Users.Usuario;
-
 @Service
 public class JuegoService {
 
@@ -17,8 +15,8 @@ public class JuegoService {
         return juegoRepository.findById(id);
     }
 
-    public Juego crearJuego(Usuario jugador) {
-        Juego juego = new Juego(jugador);
+    public Juego crearJuego(String idJugador) {
+        Juego juego = new Juego(idJugador);
         juego.iniciarJuego();
         return juegoRepository.save(juego);
     }
@@ -29,7 +27,7 @@ public class JuegoService {
         return juegoRepository.save(juego);
     }
 
-    public Juego determinarGanador(String id ) {
+    public Juego determinarGanador(String id) {
         Juego juego = findById(id).orElseThrow(() -> new RuntimeException("Juego no encontrado"));
         juego.determinarGanador();
         return juegoRepository.save(juego);

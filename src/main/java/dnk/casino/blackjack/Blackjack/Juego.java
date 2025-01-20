@@ -6,20 +6,19 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import dnk.casino.blackjack.Blackjack.Carta.Carta;
 import dnk.casino.blackjack.Blackjack.Carta.Palo;
 import dnk.casino.blackjack.Blackjack.Carta.Valor;
-import dnk.casino.blackjack.Users.Usuario;
 
 @Document(collection = "blackjack")
 public class Juego {
     @Id
     private String id;
     private IA ia;
-    private Usuario jugador;
+    private String idJugador;
     private Mano manoJugador;
     private boolean activo;
 
-    public Juego(Usuario jugador) {
+    public Juego(String idJugador) {
         this.ia = new IA();
-        this.jugador = jugador;
+        this.idJugador = idJugador;
         this.manoJugador = new Mano();
         this.activo = true;
     }
@@ -32,12 +31,12 @@ public class Juego {
         this.ia = ia;
     }
 
-    public Usuario getJugador() {
-        return jugador;
+    public String getIdJugador() {
+        return idJugador;
     }
 
-    public void setJugador(Usuario jugador) {
-        this.jugador = jugador;
+    public void setIdJugador(String idJugador) {
+        this.idJugador = idJugador;
     }
 
     public boolean isActivo() {
