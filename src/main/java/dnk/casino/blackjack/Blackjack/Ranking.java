@@ -16,7 +16,7 @@ public class Ranking {
 
         List<Integer> victorias = new ArrayList<>();
         for (Usuario usuario : usuarios) {
-            victorias.add(usuarioService.getWins(usuario.getId()));
+            victorias.add(usuarioService.getBjwins(usuario.getId()));
         }
 
         this.victorias = victorias;
