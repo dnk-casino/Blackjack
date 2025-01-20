@@ -1,4 +1,4 @@
-package dnk.casino.blackjack.Juego;
+package dnk.casino.blackjack.Blackjack;
 
 import java.util.ArrayList;
 import java.util.List;

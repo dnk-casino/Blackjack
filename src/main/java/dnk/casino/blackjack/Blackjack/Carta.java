@@ -1,4 +1,4 @@
-package dnk.casino.blackjack.Juego;
+package dnk.casino.blackjack.Blackjack;
 
 public class Carta {
     private String palo;

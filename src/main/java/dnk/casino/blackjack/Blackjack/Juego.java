@@ -1,4 +1,4 @@
-package dnk.casino.blackjack.Juego;
+package dnk.casino.blackjack.Blackjack;
 
 import org.springframework.stereotype.Service;
 
