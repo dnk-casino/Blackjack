@@ -31,79 +31,40 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     pedirCarta.addEventListener('click', () => {
-        // Pedir carta al jugador
-        const carta = obtenerCarta();
-        jugador.mano.push(carta);
-        jugador.valor = calcularValor(jugador.mano);
-        manoJugador.textContent = jugador.mano.map(carta => {
-            switch (carta.palo) {
-                case 'Corazones':
-                    return carta.valor + '♥️';
-                case 'Diamantes':
-                    return carta.valor + '♦️';
-                case 'Picas':
-                    return carta.valor + '♠️';
-                case 'Tréboles':
-                    return carta.valor + '♣️';
-                default:
-                    return '';
+        const id = localStorage.getItem('juegoID');
+        fetch(`/pedir-carta/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
             }
-        }).join(',');
-        valorJugador.textContent = jugador.valor;
-        if (jugador.valor > 21) {
-            resultado.textContent = 'Jugador pierde';
-        }
+        })
+            .then(response => { return response.ok ? response.json() : Promise.reject(response) })
+            .then(data => {
+                //pasan cosas xd
+            })
+            .catch(error => error.text().then(message => {
+                console.error(message);
+            }));
     });
 
     plantarse.addEventListener('click', () => {
-        // Plantarse
-        resultado.textContent = 'Jugador se planta';
-        // Pedir cartas a la IA
-        while (ia.valor < 17) {
-            const carta = obtenerCarta();
-            ia.mano.push(carta);
-            ia.valor = calcularValor(ia.mano);
-        }
-        manoIA.textContent = ia.mano.join(', ');
-        valorIA.textContent = ia.valor;
-        if (ia.valor > 21) {
-            resultado.textContent = 'IA pierde';
-        } else if (ia.valor > jugador.valor) {
-            resultado.textContent = 'IA gana';
-        } else if (ia.valor < jugador.valor) {
-            resultado.textContent = 'Jugador gana';
-        } else {
-            resultado.textContent = 'Empate';
-        }
-    });
-
-    function obtenerCarta() {
-        const palos = ['Corazones', 'Diamantes', 'Picas', 'Tréboles'];
-        const valores = ['As', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-        const palo = palos[Math.floor(Math.random() * palos.length)];
-        const valor = valores[Math.floor(Math.random() * valores.length)];
-        return { palo, valor };
-    }
-
-    function calcularValor(mano) {
-        let valor = 0;
-        let numAses = 0;
-        for (const carta of mano) {
-            if (carta.valor === 'As') {
-                numAses++;
-                valor += 11;
-            } else if (carta.valor === 'J' || carta.valor === 'Q' || carta.valor === 'K') {
-                valor += 10;
-            } else {
-                valor += parseInt(carta.valor);
+        const id = localStorage.getItem('juegoID');
+        fetch(`/plantarse/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
             }
-        }
-        while (valor > 21 && numAses > 0) {
-            valor -= 10;
-            numAses--;
-        }
-        return valor;
-    }
+        })
+            .then(response => { return response.ok ? response.json() : Promise.reject(response) })
+            .then(data => {
+                //pasan cosas xd
+            })
+            .catch(error => error.text().then(message => {
+                console.error(message);
+            }));
+    });
     // Fin Blackjack
 
     const toggleSections = () => {
@@ -295,54 +256,30 @@ function loadCoins() {
         .catch(error => console.error('Error:', error));
 };
 
-// Función que maneja el juego
-function playGame(cost) {
-    // Obtén los botones
+// Función para empezar el juego
+function playGame(apuesta) {
+    // Obtén los botones de apuestas y las secciones de juego y apuestas
     const buttons = document.querySelectorAll('.play-button');
+    const apuestas = document.querySelector('.apuestas');
+    const juego = document.querySelector('.juego');
 
-    // Añade la clase disabled a todos los botones
+    // Añade la clase disabled a todos los botones de apuestas
     buttons.forEach(button => button.classList.add('disabled'));
 
     // Envía la solicitud al servidor
-    var data = { "skin": document.getElementById('skin').value, "cost": cost };
-    fetch('/play', {
+    fetch(`/crear-juego/${apuesta}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + localStorage.getItem('token')
-        },
-        body: JSON.stringify(data)
+        }
     })
         .then(response => { return response.ok ? response.json() : Promise.reject(response) })
         .then(data => {
-            let resultado = data[0];
-            let skin = data[1];
-            const reels = document.querySelectorAll('.reel span');
-            pagarCoins(cost);
-
-            reels.forEach(reel => {
-                let currentCharacter = Math.floor(Math.random() * skin.length);;
-                const animation = setInterval(() => {
-                    reel.textContent = skin[currentCharacter];
-                    currentCharacter = (currentCharacter + 1) % skin.length;
-                }, 100); // Cambia el emoji cada 100ms
-
-                // Detiene la animación después de 2 segundos
-                setTimeout(() => {
-                    clearInterval(animation);
-                    // Muestra el resultado final
-                    document.getElementById('reel1').textContent = resultado.reel1;
-                    document.getElementById('reel2').textContent = resultado.reel2;
-                    document.getElementById('reel3').textContent = resultado.reel3;
-                    document.getElementById('message').textContent = resultado.message;
-                    if (resultado.message == "¡Ganaste!") {
-                        loadCoins();
-                    }
-                    loadRanking();
-                    // Quita la clase disabled a todos los botones
-                    buttons.forEach(button => button.classList.remove('disabled'));
-                }, 2000);
-            });
+            // Se habilita la zona de juego y guardamos su id
+            apuestas.style.display = 'none';
+            juego.style.display = 'block';
+            localStorage.setItem('juegoID', data.id);
         })
         .catch(error => error.text().then(message => {
             console.error(message);
@@ -351,22 +288,22 @@ function playGame(cost) {
         }));
 }
 
-// Agrega eventos de clic a los botones
-document.getElementById('play-button-1').addEventListener('click', function () {
-    if (!this.classList.contains('disabled')) {
-        playGame(1);
-    }
-});
-
-document.getElementById('play-button-2').addEventListener('click', function () {
+// Agrega eventos de clic a los botones de apuestas
+document.getElementById('apuesta-5').addEventListener('click', function () {
     if (!this.classList.contains('disabled')) {
         playGame(5);
     }
 });
 
-document.getElementById('play-button-3').addEventListener('click', function () {
+document.getElementById('apuesta-25').addEventListener('click', function () {
     if (!this.classList.contains('disabled')) {
-        playGame(10);
+        playGame(25);
+    }
+});
+
+document.getElementById('apuesta-50').addEventListener('click', function () {
+    if (!this.classList.contains('disabled')) {
+        playGame(50);
     }
 });
 
@@ -437,76 +374,70 @@ function loadRanking() {
         .catch(error => console.error('Error:', error));
 };
 
-function loadPremios(skinId) {
-    fetch(`/skins/${skinId}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
+function loadPremios() {
+    const premiosPanel = document.getElementById('premios-panel');
+    const premiosTitle = document.createElement('h3');
+    const hr = document.createElement('hr');
+    const premiosTable = document.createElement('table');
+    const premiosTableGroup = document.createElement('colgroup');
+    const colApuestas = document.createElement('col');
+    const colResultados = document.createElement('col');
+    const colPremios = document.createElement('col');
+    const apuestas = [5, 25, 50];
+
+    premiosTitle.textContent = "PREMIOS";
+    colApuestas.span = "1";
+    colApuestas.style = "width: 30%";
+    colResultados.span = "1";
+    colResultados.style = "width: 40%";
+    colPremios.span = "1";
+    colPremios.style = "width: 30%";
+
+    premiosTableGroup.appendChild(colApuestas);
+    premiosTableGroup.appendChild(colResultados);
+    premiosTableGroup.appendChild(colPremios);
+    premiosTable.appendChild(premiosTableGroup);
+
+    apuestas.forEach((apuesta) => {
+        let resultado;
+        let premio;
+        for (let i = 0; i < 3; i++) {
+            const fila = document.createElement('tr');
+            const colApuesta = document.createElement('td');
+            const colResultado = document.createElement('td');
+            const colPremio = document.createElement('td');
+
+            switch (i) {
+                case 0:
+                    resultado = "Victoria";
+                    premio = apuesta * 2;
+                    break;
+
+                case 1:
+                    resultado = "Empate";
+                    premio = apuesta;
+                    break;
+
+                case 2:
+                    resultado = "Derrota";
+                    premio = 0;
+                    break;
+            }
+
+            colApuesta.textContent = `${apuesta}\t🪙`;
+            colApuesta.title = `${apuesta} 🪙`;
+            colResultado.textContent = resultado;
+            colResultado.title = resultado;
+            colPremio.textContent = `${premio}\t🪙`;
+            colPremio.title = `${premio} 🪙`;
+
+            fila.appendChild(colApuesta);
+            fila.appendChild(colResultado);
+            fila.appendChild(colPremio);
+            premiosTable.appendChild(fila);
         }
-    })
-        .then(response => response.json())
-        .then(data => {
-            const premiosPanel = document.getElementById('premios-panel');
-            const premiosTitle = document.createElement('h3');
-            const hr = document.createElement('hr');
-            const premiosTable = document.createElement('table');
-            const premiosTableGroup = document.createElement('colgroup');
-            const colCombinacioes = document.createElement('col');
-            const colPremios = document.createElement('col');
-
-            premiosTitle.textContent = "PREMIOS";
-            colCombinacioes.span = "1";
-            colCombinacioes.style = "width: 70%";
-            colPremios.span = "1";
-            colPremios.style = "width: 30%";
-
-            premiosTableGroup.appendChild(colCombinacioes);
-            premiosTableGroup.appendChild(colPremios);
-            premiosTable.appendChild(premiosTableGroup);
-
-            data.reels.forEach((emoji, i) => {
-                const fila = document.createElement('tr');
-                const combinaciones = document.createElement('td');
-                const premios = document.createElement('td');
-                let premio;
-                switch (i) {
-                    case 0:
-                        premio = "x50";
-                        break;
-
-                    case 1:
-                        premio = "x30";
-                        break;
-
-                    case 2:
-                        premio = "x20";
-                        break;
-
-                    case 3:
-                        premio = "x10";
-                        break;
-
-                    case 4:
-                        premio = "x5";
-                        break;
-
-                    default:
-                        premio = "x3";
-                        break;
-                }
-
-                combinaciones.textContent = `${emoji} - ${emoji} - ${emoji}`;
-                combinaciones.title = combinaciones.textContent;
-                premios.textContent = `${premio}\t🪙`;
-                premios.title = `${premio} 🪙`;
-
-                fila.appendChild(combinaciones);
-                fila.appendChild(premios);
-                premiosTable.appendChild(fila);
-            });
-            premiosPanel.replaceChildren(premiosTitle, hr, premiosTable);
-        })
-        .catch(error => console.error('Error:', error));
+    });
+    premiosPanel.replaceChildren(premiosTitle, hr, premiosTable);
 }
 
 function checkAuth() {
