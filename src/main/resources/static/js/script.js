@@ -12,23 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const authSectionTitle = document.getElementById('auth-section-title');
     const skinSelect = document.getElementById('skin');
     // Blackjack
-    const manoJugador = document.getElementById('mano-jugador');
-    const valorJugador = document.getElementById('valor-jugador');
-    const manoIA = document.getElementById('mano-ia');
-    const valorIA = document.getElementById('valor-ia');
-    const resultado = document.getElementById('resultado');
     const pedirCarta = document.getElementById('pedir-carta');
     const plantarse = document.getElementById('plantarse');
-
-    let jugador = {
-        mano: [],
-        valor: 0
-    };
-
-    let ia = {
-        mano: [],
-        valor: 0
-    };
 
     pedirCarta.addEventListener('click', () => {
         const id = localStorage.getItem('juegoID');
@@ -283,9 +268,7 @@ function playGame(apuesta) {
             apuestas.style.display = 'none';
             juego.style.display = 'block';
             console.log(data);
-            let oid = data._id.toString();
-            console.log(oid);
-            localStorage.setItem('juegoID', oid);
+            localStorage.setItem('juegoID', data.id);
             loadCoins();
         })
         .catch(error => error.text().then(message => {
@@ -305,6 +288,46 @@ function finalizarJuego() {
     buttons.forEach(button => button.classList.remove('disabled'));
     loadCoins();
 };
+
+function actualizarJuego(juego) {
+    const manoJugador = document.getElementById('mano-jugador');
+    const valorJugador = document.getElementById('valor-jugador');
+    const manoIA = document.getElementById('mano-ia');
+    const valorIA = document.getElementById('valor-ia');
+    const resultado = document.getElementById('resultado');
+
+    manoJugador.textContent = juego.manoJugador.map(carta => {
+        let palo;
+        let valor;
+        switch (carta.palo) {
+            case 'CORAZONES':
+                palo = '♥️';
+                break;
+            case 'DIAMANTES':
+                palo = '♦️';
+                break;
+            case 'PICAS':
+                palo = '♠️';
+                break;
+            case 'TREBOLES':
+                palo = '♣️';
+                break;
+            default:
+                palo = '';
+                break;
+        }
+        switch (carta.valor) {
+            case value:
+                valor = 11;
+                break;
+
+            default:
+                valor = 0;
+                break;
+        }
+    }).join(',');
+    valorJugador.textContent = "";//me he  quedado por aqui
+}
 
 // Agrega eventos de clic a los botones de apuestas
 document.getElementById('apuesta-5').addEventListener('click', function () {

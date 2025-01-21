@@ -1,6 +1,6 @@
 package dnk.casino.blackjack.Blackjack;
 
-import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,12 +11,18 @@ import dnk.casino.blackjack.Blackjack.Carta.Valor;
 
 @Document(collection = "blackjack")
 public class Juego {
-    @JsonProperty("_id")
-    private ObjectId id;
+    @Id
+    @JsonProperty
+    private String id;
+    @JsonProperty
     private int apuesta;
+    @JsonProperty
     private IA ia;
+    @JsonProperty
     private String idJugador;
+    @JsonProperty
     private Mano manoJugador;
+    @JsonProperty
     private boolean activo;
 
     public Juego(String idJugador, int apuesta) {
