@@ -170,4 +170,12 @@ public class Usuario {
     public void bjvictoria() {
         bjwins++;
     }
+
+    public void pagar(int coins) {
+        this.coins -= coins;
+    }
+
+    public void cobrar(int coins) {
+        this.coins += coins;
+    }
 }

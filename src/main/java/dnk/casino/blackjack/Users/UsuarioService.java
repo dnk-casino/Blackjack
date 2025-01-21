@@ -101,6 +101,18 @@ public class UsuarioService {
         }
     }
 
+    public Usuario pagar(String id, int coins) {
+        Usuario user = usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        user.pagar(coins);
+        return usuarioRepository.save(user);
+    }
+
+    public Usuario cobrar(String id, int coins) {
+        Usuario user = usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        user.cobrar(coins);
+        return usuarioRepository.save(user);
+    }
+
     public int getBjwins(String id) {
         Usuario user = usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         return user.getBjwins();

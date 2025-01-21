@@ -11,16 +11,26 @@ import dnk.casino.blackjack.Blackjack.Carta.Valor;
 public class Juego {
     @Id
     private String id;
+    private int apuesta;
     private IA ia;
     private String idJugador;
     private Mano manoJugador;
     private boolean activo;
 
-    public Juego(String idJugador) {
+    public Juego(String idJugador, int apuesta) {
+        this.apuesta = apuesta;
         this.ia = new IA();
         this.idJugador = idJugador;
         this.manoJugador = new Mano();
         this.activo = true;
+    }
+
+    public int getApuesta() {
+        return apuesta;
+    }
+
+    public void setApuesta(int apuesta) {
+        this.apuesta = apuesta;
     }
 
     public IA getIa() {
@@ -97,6 +107,15 @@ public class Juego {
     public void pedirCartaIA() {
         Carta carta = new Carta(randomPalo(), randomValor());
         ia.agregarCarta(carta);
+    }
+
+    public int plantarse() {
+        if (getValorJugador() <= 21) {
+            while (getValorIA() < 17) {
+                pedirCartaIA();
+            }
+        }
+        return determinarGanador();
     }
 
     // Si el jugador gana = 1 | Si la IA gana = 2 | Empate = 0

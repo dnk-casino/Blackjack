@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import dnk.casino.blackjack.Blackjack.Juego;
+import dnk.casino.blackjack.Blackjack.JuegoService;
 import dnk.casino.blackjack.Blackjack.Ranking;
 import dnk.casino.blackjack.Users.JwtTokenUtil;
 import dnk.casino.blackjack.Users.Usuario;
@@ -26,8 +28,6 @@ import dnk.casino.blackjack.Users.UsuarioService;
 
 @Controller
 public class BlackjackController {
-    @Autowired
-    private Juego juego;
 
     @Autowired
     private UsuarioService usuarioService;
@@ -51,40 +51,6 @@ public class BlackjackController {
     public String restablecerContrasena(Model model, @RequestParam(required = false) String token) {
         model.addAttribute("token", token);
         return "restablecer-contrasena";
-    }
-
-    @GetMapping("/iniciar-juego")
-    public String iniciarJuego() {
-        juego.iniciarJuego();
-        return "Juego iniciado";
-    }
-
-    @PostMapping("/pedir-carta")
-    public String pedirCarta() {
-        juego.pedirCarta();
-        return "Carta pedida";
-    }
-
-    @PostMapping("/pedir-carta-ia")
-    public String pedirCartaIA() {
-        juego.pedirCartaIA();
-        return "Carta pedida para la IA";
-    }
-
-    @PostMapping(value = "/determinar-ganador", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public ResponseEntity<Integer> determinarGanador(@RequestHeader("Authorization") String token) {
-        Optional<String> usernameOpt = JwtTokenUtil.extractUsernameFromToken(token);
-        if (usernameOpt.isPresent()) {
-            Optional<Usuario> usuarioOpt = usuarioService.findByUsername(usernameOpt.get());
-            if (usuarioOpt.isPresent()) {
-                return ResponseEntity.ok(juego.determinarGanador());
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
     }
 
     @PostMapping(value = "/coins", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -136,29 +102,6 @@ public class BlackjackController {
         return ResponseEntity.ok(new Ranking(usuarios, usuarioService));
     }
 
-    public static class PlayRequest {
-        @JsonProperty("skin")
-        private String skin;
-        @JsonProperty("cost")
-        private int cost;
-
-        public int getCost() {
-            return cost;
-        }
-
-        public void setCost(int cost) {
-            this.cost = cost;
-        }
-
-        public String getSkin() {
-            return skin;
-        }
-
-        public void setSkin(String skin) {
-            this.skin = skin;
-        }
-    }
-
     public static class CoinUpdateRequest {
         @JsonProperty("delta")
         private int delta;
@@ -169,6 +112,91 @@ public class BlackjackController {
 
         public void setDelta(int delta) {
             this.delta = delta;
+        }
+    }
+
+    // Blackjack
+
+    @Autowired
+    private JuegoService juegoService;
+
+    @PostMapping(value = "/crear-juego/{apuesta}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> crearJuego(@PathVariable int apuesta, @RequestHeader("Authorization") String token) {
+        Optional<String> usernameOpt = JwtTokenUtil.extractUsernameFromToken(token);
+        if (usernameOpt.isPresent()) {
+            Optional<Usuario> usuarioOpt = usuarioService.findByUsername(usernameOpt.get());
+            if (usuarioOpt.isPresent()) {
+                Usuario usuario = usuarioOpt.get();
+                if (usuario.getCoins() >= apuesta) {
+                    usuarioService.pagar(usuario.getId(), apuesta);
+                    return ResponseEntity.ok(juegoService.crearJuego(usuario.getId(), apuesta));
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+    @PostMapping("/pedir-carta/{id}")
+    public ResponseEntity<?> pedirCarta(@PathVariable String id, @RequestHeader("Authorization") String token) {
+        Optional<String> usernameOpt = JwtTokenUtil.extractUsernameFromToken(token);
+        if (usernameOpt.isPresent()) {
+            Optional<Usuario> usuarioOpt = usuarioService.findByUsername(usernameOpt.get());
+            if (usuarioOpt.isPresent()) {
+                Optional<Juego> juegoOpt = juegoService.findById(id);
+                if (juegoOpt.isPresent()) {
+                    if (juegoOpt.get().isActivo()) {
+                        return ResponseEntity.ok(juegoService.pedirCarta(id));
+                    } else {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                    }
+                } else {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+    @PostMapping(value = "/plantarse/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> plantarse(@PathVariable String id, @RequestHeader("Authorization") String token) {
+        Optional<String> usernameOpt = JwtTokenUtil.extractUsernameFromToken(token);
+        if (usernameOpt.isPresent()) {
+            Optional<Usuario> usuarioOpt = usuarioService.findByUsername(usernameOpt.get());
+            if (usuarioOpt.isPresent()) {
+                Optional<Juego> juegoOpt = juegoService.findById(id);
+                if (juegoOpt.isPresent()) {
+                    if (juegoOpt.get().isActivo()) {
+                        Object[] result = juegoService.plantarse(id);
+                        switch ((int) result[1]) {
+                            case 0 -> {
+                                usuarioService.cobrar(usuarioOpt.get().getId(), juegoOpt.get().getApuesta());
+                            }
+                            case 1 -> {
+                                usuarioService.cobrar(usuarioOpt.get().getId(), (juegoOpt.get().getApuesta() * 2));
+                            }
+                            default -> {
+                            }
+                        }
+                        return ResponseEntity.ok(result);
+                    } else {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                    }
+                } else {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 }
