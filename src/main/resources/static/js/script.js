@@ -60,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(response => { return response.ok ? response.json() : Promise.reject(response) })
             .then(data => {
                 //pasan cosas xd
+                finalizarJuego();
             })
             .catch(error => error.text().then(message => {
                 console.error(message);
@@ -92,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (response.ok) {
             const token = await response.text(); // Podrías guardar un JWT si usas uno
             localStorage.setItem('token', token);
+            loadPremios();
             loadCoins();
             cargarSkins();
             loadRanking();
@@ -228,6 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Comprueba si hay token almacenado
     if (checkAuth()) {
+        loadPremios();
         loadCoins();
         cargarSkins();
         loadRanking();
@@ -279,7 +282,11 @@ function playGame(apuesta) {
             // Se habilita la zona de juego y guardamos su id
             apuestas.style.display = 'none';
             juego.style.display = 'block';
-            localStorage.setItem('juegoID', data.id);
+            console.log(data);
+            let oid = data._id.toString();
+            console.log(oid);
+            localStorage.setItem('juegoID', oid);
+            loadCoins();
         })
         .catch(error => error.text().then(message => {
             console.error(message);
@@ -287,6 +294,17 @@ function playGame(apuesta) {
             buttons.forEach(button => button.classList.remove('disabled'));
         }));
 }
+
+function finalizarJuego() {
+    localStorage.removeItem('juegoID');
+    const juego = document.querySelector('.juego');
+    const apuestas = document.querySelector('.apuestas');
+    const buttons = document.querySelectorAll('.play-button');
+    juego.style.display = 'none';
+    apuestas.style.display = 'block';
+    buttons.forEach(button => button.classList.remove('disabled'));
+    loadCoins();
+};
 
 // Agrega eventos de clic a los botones de apuestas
 document.getElementById('apuesta-5').addEventListener('click', function () {

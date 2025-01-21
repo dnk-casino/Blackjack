@@ -16,7 +16,7 @@ public class JuegoService {
     }
 
     public Juego crearJuego(String idJugador, int apuesta) {
-        Optional<Juego> juegoOpt = juegoRepository.findByIdJugador(idJugador);
+        Optional<Juego> juegoOpt = juegoRepository.findLastActiveJuegoByJugador(idJugador);
         if (juegoOpt.isPresent()) {
             if (!juegoOpt.get().isActivo()) {
                 return iniciarJuego(idJugador, apuesta);

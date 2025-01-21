@@ -120,7 +120,7 @@ public class BlackjackController {
     @Autowired
     private JuegoService juegoService;
 
-    @PostMapping(value = "/crear-juego/{apuesta}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/crear-juego/{apuesta}")
     public ResponseEntity<?> crearJuego(@PathVariable int apuesta, @RequestHeader("Authorization") String token) {
         Optional<String> usernameOpt = JwtTokenUtil.extractUsernameFromToken(token);
         if (usernameOpt.isPresent()) {
@@ -131,13 +131,13 @@ public class BlackjackController {
                     usuarioService.pagar(usuario.getId(), apuesta);
                     return ResponseEntity.ok(juegoService.crearJuego(usuario.getId(), apuesta));
                 } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No tienes suficientes monedas");
                 }
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Tienes que iniciar sesión");
         }
     }
 
@@ -152,20 +152,20 @@ public class BlackjackController {
                     if (juegoOpt.get().isActivo()) {
                         return ResponseEntity.ok(juegoService.pedirCarta(id));
                     } else {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La partida ya ha terminado");
                     }
                 } else {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Partida no encontrada");
                 }
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no econtrado");
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Tienes que iniciar sesión");
         }
     }
 
-    @PostMapping(value = "/plantarse/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/plantarse/{id}")
     public ResponseEntity<?> plantarse(@PathVariable String id, @RequestHeader("Authorization") String token) {
         Optional<String> usernameOpt = JwtTokenUtil.extractUsernameFromToken(token);
         if (usernameOpt.isPresent()) {
@@ -187,16 +187,16 @@ public class BlackjackController {
                         }
                         return ResponseEntity.ok(result);
                     } else {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La partida ya ha terminado");
                     }
                 } else {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Partida no encontrada");
                 }
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no econtrado");
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Tienes que iniciar sesión");
         }
     }
 }
