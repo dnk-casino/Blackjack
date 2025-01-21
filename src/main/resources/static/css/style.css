@@ -26,7 +26,18 @@ h1 {
   margin-bottom: 20px;
 }
 
+.apuestas {
+  width: 30%;
+  margin: 40px auto;
+  text-align: center;
+  background-color: #333;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
 .juego {
+  display: none;
   width: 30%;
   margin: 40px auto;
   text-align: center;
@@ -297,6 +308,7 @@ select option {
   }
 
   .juego,
+  .apuestas,
   #ranking-panel,
   #premios-panel {
     width: 80%;
