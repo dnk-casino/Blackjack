@@ -15,6 +15,10 @@ public class JuegoService {
         return juegoRepository.findById(id);
     }
 
+    public Optional<Juego> findLastActiveJuegoByJugador(String idJugador) {
+        return juegoRepository.findLastActiveJuegoByJugador(idJugador);
+    }
+
     public Juego crearJuego(String idJugador, int apuesta) {
         Optional<Juego> juegoOpt = juegoRepository.findLastActiveJuegoByJugador(idJugador);
         if (juegoOpt.isPresent()) {

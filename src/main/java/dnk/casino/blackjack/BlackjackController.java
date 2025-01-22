@@ -155,6 +155,46 @@ public class BlackjackController {
         }
     }
 
+    @PostMapping("/juego/{id}")
+    public ResponseEntity<?> getJuego(@PathVariable String id, @RequestHeader("Authorization") String token) {
+        Optional<String> usernameOpt = JwtTokenUtil.extractUsernameFromToken(token);
+        if (usernameOpt.isPresent()) {
+            Optional<Usuario> usuarioOpt = usuarioService.findByUsername(usernameOpt.get());
+            if (usuarioOpt.isPresent()) {
+                Optional<Juego> juegoOpt = juegoService.findById(id);
+                if (juegoOpt.isPresent()) {
+                    return ResponseEntity.ok(juegoOpt.get());
+                } else {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Partida no encontrada");
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no econtrado");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Tienes que iniciar sesión");
+        }
+    }
+
+    @PostMapping("/juegoActivo")
+    public ResponseEntity<?> getJuegoActivo(@RequestHeader("Authorization") String token) {
+        Optional<String> usernameOpt = JwtTokenUtil.extractUsernameFromToken(token);
+        if (usernameOpt.isPresent()) {
+            Optional<Usuario> usuarioOpt = usuarioService.findByUsername(usernameOpt.get());
+            if (usuarioOpt.isPresent()) {
+                Optional<Juego> juegoOpt = juegoService.findLastActiveJuegoByJugador(usuarioOpt.get().getId());
+                if (juegoOpt.isPresent()) {
+                    return ResponseEntity.ok(juegoOpt.get());
+                } else {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Partida no encontrada");
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no econtrado");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Tienes que iniciar sesión");
+        }
+    }
+
     @PostMapping("/pedir-carta/{id}")
     public ResponseEntity<?> pedirCarta(@PathVariable String id, @RequestHeader("Authorization") String token) {
         Optional<String> usernameOpt = JwtTokenUtil.extractUsernameFromToken(token);

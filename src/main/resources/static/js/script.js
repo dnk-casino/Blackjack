@@ -103,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadPremios();
             loadCoins();
             loadRanking();
+            recuperarJuego();
             toggleSections();
         } else {
             alert('Usuario o contraseña incorrectos');
@@ -183,6 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Manejo del cierre de sesión
     logoutButton.addEventListener('click', () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('juegoID');
         toggleSections();
     });
 
@@ -191,6 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadPremios();
         loadCoins();
         loadRanking();
+        recuperarJuego();
     } else {
         localStorage.removeItem('token');
     }
@@ -341,6 +344,56 @@ function calcularValor(mano) {
     }
     return valor;
 };
+
+function recuperarJuego() {
+    const apuestas = document.querySelector('.apuestas');
+    const juego = document.querySelector('.juego');
+
+    if (localStorage.getItem('juegoID') !== null) {
+        fetch(`/juego/${localStorage.getItem('juegoID')}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        })
+            .then(response => { return response.ok ? response.json() : Promise.reject(response) })
+            .then(data => {
+                // Se habilita la zona de juego
+                apuestas.style.display = 'none';
+                juego.style.display = 'block';
+                actualizarJuego(data);
+                if (!data.activo) {
+                    finalizarJuego(calcularResultado(data));
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    } else {
+        fetch('/juegoActivo', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        })
+            .then(response => { return response.ok ? response.json() : Promise.reject(response) })
+            .then(data => {
+                // Se habilita la zona de juego y guardamos su id
+                apuestas.style.display = 'none';
+                juego.style.display = 'block';
+                localStorage.setItem('juegoID', data.id);
+                actualizarJuego(data);
+                if (!data.activo) {
+                    finalizarJuego(calcularResultado(data));
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }
+}
 
 // Agrega eventos de clic a los botones de apuestas
 document.getElementById('apuesta-5').addEventListener('click', function () {
