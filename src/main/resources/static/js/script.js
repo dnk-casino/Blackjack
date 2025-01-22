@@ -500,7 +500,7 @@ function loadPremios() {
     apuestas.forEach((apuesta) => {
         let resultado;
         let premio;
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 2; i++) {
             const fila = document.createElement('tr');
             const colApuesta = document.createElement('td');
             const colResultado = document.createElement('td');
@@ -515,11 +515,6 @@ function loadPremios() {
                 case 1:
                     resultado = "Empate";
                     premio = apuesta;
-                    break;
-
-                case 2:
-                    resultado = "Derrota";
-                    premio = 0;
                     break;
             }
 
