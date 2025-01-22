@@ -97,7 +97,7 @@ public class BlackjackController {
     @ResponseBody
     public ResponseEntity<?> getRanking() {
         // Obtén los 5 jugadores con más victorias
-        List<Usuario> usuarios = usuarioService.getTop5Winners();
+        List<Usuario> usuarios = usuarioService.getTop5BJWinners();
         // Crea un objeto que contenga el ranking
         return ResponseEntity.ok(new Ranking(usuarios, usuarioService));
     }
@@ -129,7 +129,21 @@ public class BlackjackController {
                 Usuario usuario = usuarioOpt.get();
                 if (usuario.getCoins() >= apuesta) {
                     usuarioService.pagar(usuario.getId(), apuesta);
-                    return ResponseEntity.ok(juegoService.crearJuego(usuario.getId(), apuesta));
+                    Juego juego = juegoService.crearJuego(usuario.getId(), apuesta);
+                    if (!juego.isActivo()) {
+                        switch (juego.determinarGanador()) {
+                            case 0 -> {
+                                usuarioService.cobrar(usuario.getId(), juego.getApuesta());
+                            }
+                            case 1 -> {
+                                usuarioService.cobrar(usuario.getId(), (juego.getApuesta() * 2));
+                                usuarioService.bjvictoria(usuario.getId());
+                            }
+                            default -> {
+                            }
+                        }
+                    }
+                    return ResponseEntity.ok(juego);
                 } else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No tienes suficientes monedas");
                 }
@@ -171,16 +185,18 @@ public class BlackjackController {
         if (usernameOpt.isPresent()) {
             Optional<Usuario> usuarioOpt = usuarioService.findByUsername(usernameOpt.get());
             if (usuarioOpt.isPresent()) {
+                Usuario usuario = usuarioOpt.get();
                 Optional<Juego> juegoOpt = juegoService.findById(id);
                 if (juegoOpt.isPresent()) {
                     if (juegoOpt.get().isActivo()) {
                         Object[] result = juegoService.plantarse(id);
                         switch ((int) result[1]) {
                             case 0 -> {
-                                usuarioService.cobrar(usuarioOpt.get().getId(), juegoOpt.get().getApuesta());
+                                usuarioService.cobrar(usuario.getId(), juegoOpt.get().getApuesta());
                             }
                             case 1 -> {
-                                usuarioService.cobrar(usuarioOpt.get().getId(), (juegoOpt.get().getApuesta() * 2));
+                                usuarioService.cobrar(usuario.getId(), (juegoOpt.get().getApuesta() * 2));
+                                usuarioService.bjvictoria(usuario.getId());
                             }
                             default -> {
                             }

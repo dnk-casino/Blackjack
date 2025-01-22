@@ -113,6 +113,11 @@ public class UsuarioService {
         return usuarioRepository.save(user);
     }
 
+    public int getWins(String id) {
+        Usuario user = usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        return user.getWins();
+    }
+
     public int getBjwins(String id) {
         Usuario user = usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         return user.getBjwins();
@@ -125,6 +130,18 @@ public class UsuarioService {
     }
 
     public List<Usuario> getTop5Winners() {
+        List<Usuario> usuarios = getAllUsers();
+
+        usuarios.sort((u1, u2) -> {
+            long wins1 = getWins(u1.getId());
+            long wins2 = getWins(u2.getId());
+            return Long.compare(wins2, wins1);
+        });
+
+        return usuarios.subList(0, Math.min(5, usuarios.size()));
+    }
+
+    public List<Usuario> getTop5BJWinners() {
         List<Usuario> usuarios = getAllUsers();
 
         usuarios.sort((u1, u2) -> {

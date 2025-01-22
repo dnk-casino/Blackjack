@@ -1,3 +1,26 @@
+const palos = {
+    CORAZONES: { nombre: "Corazones", simbolo: "♥️" },
+    DIAMANTES: { nombre: "Diamantes", simbolo: "♦️" },
+    PICAS: { nombre: "Picas", simbolo: "♠️" },
+    TREBOLES: { nombre: "Tréboles", simbolo: "♣️" }
+};
+
+const valores = {
+    AS: { nombre: "As", valor: 11, simbolo: "A" },
+    DOS: { nombre: "Dos", valor: 2, simbolo: "2" },
+    TRES: { nombre: "Tres", valor: 3, simbolo: "3" },
+    CUATRO: { nombre: "Cuatro", valor: 4, simbolo: "4" },
+    CINCO: { nombre: "Cinco", valor: 5, simbolo: "5" },
+    SEIS: { nombre: "Seis", valor: 6, simbolo: "6" },
+    SIETE: { nombre: "Siete", valor: 7, simbolo: "7" },
+    OCHO: { nombre: "Ocho", valor: 8, simbolo: "8" },
+    NUEVE: { nombre: "Nueve", valor: 9, simbolo: "9" },
+    DIEZ: { nombre: "Diez", valor: 10, simbolo: "10" },
+    JOTA: { nombre: "Jota", valor: 10, simbolo: "J" },
+    REINA: { nombre: "Reina", valor: 10, simbolo: "Q" },
+    REY: { nombre: "Rey", valor: 10, simbolo: "K" }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const authSection = document.getElementById('auth-section');
     const gameSection = document.getElementById('game-section');
@@ -10,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const showRestablecerButton = document.getElementById('showRestablecer');
     const logoutButton = document.getElementById('logout-button');
     const authSectionTitle = document.getElementById('auth-section-title');
-    const skinSelect = document.getElementById('skin');
     // Blackjack
     const pedirCarta = document.getElementById('pedir-carta');
     const plantarse = document.getElementById('plantarse');
@@ -26,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
             .then(response => { return response.ok ? response.json() : Promise.reject(response) })
             .then(data => {
-                //pasan cosas xd
+                actualizarJuego(data);
             })
             .catch(error => error.text().then(message => {
                 console.error(message);
@@ -44,12 +66,12 @@ document.addEventListener('DOMContentLoaded', () => {
         })
             .then(response => { return response.ok ? response.json() : Promise.reject(response) })
             .then(data => {
-                //pasan cosas xd
-                finalizarJuego();
+                actualizarJuego(data[0]);
+                finalizarJuego(data[1]);
             })
-            .catch(error => error.text().then(message => {
-                console.error(message);
-            }));
+            .catch(error => {
+                console.error(error);
+            });
     });
     // Fin Blackjack
 
@@ -80,7 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('token', token);
             loadPremios();
             loadCoins();
-            cargarSkins();
             loadRanking();
             toggleSections();
         } else {
@@ -134,13 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Para cambiar el title del select igual a su option
-    skinSelect.addEventListener('change', () => {
-        skinSelect.title = skinSelect.options[skinSelect.selectedIndex].title;
-        localStorage.setItem("lastSkin", skinSelect.options[skinSelect.selectedIndex].value);
-        loadPremios(skinSelect.selectedOptions[0].id);
-    });
-
     // Alternar entre login y registro
     showLoginButton.addEventListener('click', () => {
         registerForm.style.display = 'none';
@@ -172,52 +186,10 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleSections();
     });
 
-    // Manejo para cargar las skins en el select
-    const cargarSkins = () => {
-        fetch('/skins/desbloqueadas', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('token')  // Aquí pasas el token
-            }
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('No se pudo cargar las skins');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Limpia las opciones existentes
-                skinSelect.innerHTML = '';
-
-                // Agrega las skins desbloqueadas como opciones
-                data.reverse().forEach(skin => {
-                    const option = document.createElement('option');
-                    option.value = skin.name;
-                    option.id = skin.id;
-                    option.textContent = skin.name;
-                    option.title = skin.description;
-                    option.selected = skin.name == localStorage.getItem("lastSkin") ? true : false;
-                    skinSelect.appendChild(option);
-                });
-
-                // Actualizamos el title del select
-                skinSelect.title = skinSelect.options[skinSelect.selectedIndex].title;
-
-                // Carga inicial del panel de premios
-                loadPremios(skinSelect.selectedOptions[0].id);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    };
-
     // Comprueba si hay token almacenado
     if (checkAuth()) {
         loadPremios();
         loadCoins();
-        cargarSkins();
         loadRanking();
     } else {
         localStorage.removeItem('token');
@@ -267,26 +239,46 @@ function playGame(apuesta) {
             // Se habilita la zona de juego y guardamos su id
             apuestas.style.display = 'none';
             juego.style.display = 'block';
-            console.log(data);
             localStorage.setItem('juegoID', data.id);
             loadCoins();
+            actualizarJuego(data);
+            if (!data.activo) {
+                finalizarJuego(calcularResultado(data));
+            }
         })
-        .catch(error => error.text().then(message => {
-            console.error(message);
+        .catch(error => {
+            console.error(error);
             // Quita la clase disabled a todos los botones
             buttons.forEach(button => button.classList.remove('disabled'));
-        }));
+        });
 }
 
-function finalizarJuego() {
+function calcularResultado(juego) {
+    if (juego.valorJugador === 21 && juego.valorIA === 21) { return 0; }
+    else if (juego.valorJugador === 21) { return 1; }
+    else { return 2; }
+}
+
+function finalizarJuego(result) {
+    const resultadoDiv = document.querySelector('.resultado');
+    const resultado = document.getElementById('resultado');
     localStorage.removeItem('juegoID');
-    const juego = document.querySelector('.juego');
-    const apuestas = document.querySelector('.apuestas');
-    const buttons = document.querySelectorAll('.play-button');
-    juego.style.display = 'none';
-    apuestas.style.display = 'block';
-    buttons.forEach(button => button.classList.remove('disabled'));
     loadCoins();
+    loadRanking();
+
+    switch (result) {
+        case 1:
+            resultado.textContent = "Gana el Jugador";
+            break;
+        case 2:
+            resultado.textContent = "Gana el Dealer";
+            break;
+        default:
+            resultado.textContent = "Empate";
+            break;
+    }
+
+    resultadoDiv.style.display = 'block';
 };
 
 function actualizarJuego(juego) {
@@ -294,40 +286,61 @@ function actualizarJuego(juego) {
     const valorJugador = document.getElementById('valor-jugador');
     const manoIA = document.getElementById('mano-ia');
     const valorIA = document.getElementById('valor-ia');
-    const resultado = document.getElementById('resultado');
 
-    manoJugador.textContent = juego.manoJugador.map(carta => {
-        let palo;
-        let valor;
-        switch (carta.palo) {
-            case 'CORAZONES':
-                palo = '♥️';
-                break;
-            case 'DIAMANTES':
-                palo = '♦️';
-                break;
-            case 'PICAS':
-                palo = '♠️';
-                break;
-            case 'TREBOLES':
-                palo = '♣️';
-                break;
-            default:
-                palo = '';
-                break;
-        }
-        switch (carta.valor) {
-            case value:
-                valor = 11;
-                break;
+    manoJugador.innerHTML = '';
+    juego.manoJugador.cartas.forEach(carta => {
+        const divCarta = document.createElement('div');
+        const divValor = document.createElement('div');
+        const divPalo = document.createElement('div');
 
-            default:
-                valor = 0;
-                break;
+        divValor.textContent = valores[carta.valor].simbolo;
+        divPalo.textContent = palos[carta.palo].simbolo;
+
+        divCarta.className = 'carta';
+        divCarta.appendChild(divValor);
+        divCarta.appendChild(divPalo);
+        manoJugador.appendChild(divCarta);
+    });
+    valorJugador.textContent = juego.valorJugador;
+
+    manoIA.innerHTML = '';
+    juego.manoIA.cartas.forEach(carta => {
+        const divCarta = document.createElement('div');
+        const divValor = document.createElement('div');
+        const divPalo = document.createElement('div');
+
+        divValor.textContent = valores[carta.valor].simbolo;
+        divPalo.textContent = palos[carta.palo].simbolo;
+
+        divCarta.className = 'carta';
+        divCarta.appendChild(divValor);
+        divCarta.appendChild(divPalo);
+        manoIA.appendChild(divCarta);
+    });
+    valorIA.textContent = juego.valorIA;
+};
+
+// No hace falta pero esta wapo tenerlo
+function calcularValor(mano) {
+    let valor = 0;
+    let numAses = 0;
+    for (const carta of mano) {
+        let simbolo = valores[carta.valor].simbolo
+        if (simbolo === 'A') {
+            numAses++;
+            valor += 11;
+        } else if (simbolo === 'J' || simbolo === 'Q' || simbolo === 'K') {
+            valor += 10;
+        } else {
+            valor += parseInt(valores[carta.valor].valor);
         }
-    }).join(',');
-    valorJugador.textContent = "";//me he  quedado por aqui
-}
+    }
+    while (valor > 21 && numAses > 0) {
+        valor -= 10;
+        numAses--;
+    }
+    return valor;
+};
 
 // Agrega eventos de clic a los botones de apuestas
 document.getElementById('apuesta-5').addEventListener('click', function () {
@@ -348,23 +361,15 @@ document.getElementById('apuesta-50').addEventListener('click', function () {
     }
 });
 
-document.getElementById('show-wins-button').addEventListener('click', function () {
-    fetch('/wins', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + localStorage.getItem('token')
-        }
-    })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('message').textContent = "Victorias: " + data;
-        })
-        .catch(error => console.error('Error:', error));
-});
-
-document.getElementById('tienda').addEventListener('click', function () {
-    location.href = "/tienda";
+document.getElementById('salir').addEventListener('click', function () {
+    const juego = document.querySelector('.juego');
+    const apuestas = document.querySelector('.apuestas');
+    const buttons = document.querySelectorAll('.play-button');
+    const resultadoDiv = document.querySelector('.resultado');
+    resultadoDiv.style.display = 'none';
+    juego.style.display = 'none';
+    apuestas.style.display = 'block';
+    buttons.forEach(button => button.classList.remove('disabled'));
 });
 
 function loadRanking() {
