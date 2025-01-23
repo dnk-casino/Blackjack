@@ -42,11 +42,11 @@ h1 {
 
 .juego {
   display: none;
-  width: 30%;
-  margin: 40px auto;
+  width: 45%;
+  margin: 0 auto;
   text-align: center;
   background-color: #333;
-  padding: 20px;
+  padding: 10px 20px 10px 20px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
@@ -55,17 +55,26 @@ h1 {
   color: #fff;
   text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   font-size: 32px;
+  margin: 0 auto;
 }
 
 .juego p {
   color: #fff;
   font-size: 24px;
   font-weight: bold;
+  margin: 0 auto;
+}
+
+.juego .buttons {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
 }
 
 .mano {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5em;
+  margin-top: 0.5em;
   margin-bottom: 0.5em;
 }
 
@@ -258,7 +267,7 @@ select option {
   position: absolute;
   top: 20px;
   left: 20px;
-  width: 28%;
+  width: 22%;
   background-color: #333;
   padding: 10px 10px 20px 10px;
   border-radius: 10px;
@@ -317,7 +326,7 @@ select option {
   position: absolute;
   top: 15%;
   right: 20px;
-  width: 28%;
+  width: 22%;
   background-color: #333;
   padding: 10px 10px 20px 10px;
   border-radius: 10px;
