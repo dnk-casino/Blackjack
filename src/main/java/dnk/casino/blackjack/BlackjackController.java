@@ -19,12 +19,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import dnk.casino.Users.JwtTokenUtil;
+import dnk.casino.Users.Usuario;
+import dnk.casino.Users.UsuarioService;
 import dnk.casino.blackjack.Blackjack.Juego;
 import dnk.casino.blackjack.Blackjack.JuegoService;
 import dnk.casino.blackjack.Blackjack.Ranking;
-import dnk.casino.blackjack.Users.JwtTokenUtil;
-import dnk.casino.blackjack.Users.Usuario;
-import dnk.casino.blackjack.Users.UsuarioService;
 
 @Controller
 public class BlackjackController {

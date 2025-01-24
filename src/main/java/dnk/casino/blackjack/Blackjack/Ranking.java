@@ -3,8 +3,8 @@ package dnk.casino.blackjack.Blackjack;
 import java.util.ArrayList;
 import java.util.List;
 
-import dnk.casino.blackjack.Users.Usuario;
-import dnk.casino.blackjack.Users.UsuarioService;
+import dnk.casino.Users.Usuario;
+import dnk.casino.Users.UsuarioService;
 
 public class Ranking {
 
