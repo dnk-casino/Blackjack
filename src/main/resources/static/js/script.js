@@ -271,8 +271,10 @@ function finalizarJuego(result) {
     const botones = document.querySelector('.jugador .buttons');
     const resultadoDiv = document.querySelector('.resultado');
     const resultado = document.getElementById('resultado');
+    const separador = document.querySelector('.juego hr');
     localStorage.removeItem('juegoID');
     botones.style.display = 'none';
+    separador.style.display = 'block';
     loadCoins();
     loadRanking();
 
@@ -436,8 +438,10 @@ document.getElementById('salir').addEventListener('click', function () {
     const buttons = document.querySelectorAll('.play-button');
     const resultadoDiv = document.querySelector('.resultado');
     const botones = document.querySelector('.jugador .buttons');
+    const separador = document.querySelector('.juego hr');
     resultadoDiv.style.display = 'none';
     juego.style.display = 'none';
+    separador.style.display = 'none';
     botones.style.display = 'flex';
     apuestas.style.display = 'block';
     buttons.forEach(button => button.classList.remove('disabled'));
