@@ -49,6 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(response => { return response.ok ? response.json() : Promise.reject(response) })
             .then(data => {
                 actualizarJuego(data);
+                if (!data.activo) {
+                    finalizarJuego(calcularResultado(data));
+                }
             })
             .catch(error => error.text().then(message => {
                 console.error(message);
@@ -263,9 +266,11 @@ function calcularResultado(juego) {
 }
 
 function finalizarJuego(result) {
+    const botones = document.querySelector('.jugador .buttons');
     const resultadoDiv = document.querySelector('.resultado');
     const resultado = document.getElementById('resultado');
     localStorage.removeItem('juegoID');
+    botones.style.display = 'none';
     loadCoins();
     loadRanking();
 
@@ -419,8 +424,10 @@ document.getElementById('salir').addEventListener('click', function () {
     const apuestas = document.querySelector('.apuestas');
     const buttons = document.querySelectorAll('.play-button');
     const resultadoDiv = document.querySelector('.resultado');
+    const botones = document.querySelector('.jugador .buttons');
     resultadoDiv.style.display = 'none';
     juego.style.display = 'none';
+    botones.style.display = 'flex';
     apuestas.style.display = 'block';
     buttons.forEach(button => button.classList.remove('disabled'));
 });

@@ -110,6 +110,9 @@ public class Juego {
     public void pedirCarta() {
         Carta carta = new Carta(randomPalo(), randomValor());
         agregarCartaJugador(carta);
+        if (getValorJugador() >= 21) {
+            plantarse();
+        }
     }
 
     public void pedirCartaIA() {
