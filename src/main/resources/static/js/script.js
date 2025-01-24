@@ -7,7 +7,7 @@ const palos = {
 };
 
 const valores = {
-    OCULTO: { nombre: "Oculto", valor: 0, simbolo: "O" },
+    OCULTO: { nombre: "Oculto", valor: 0, simbolo: "?" },
     AS: { nombre: "As", valor: 11, simbolo: "A" },
     DOS: { nombre: "Dos", valor: 2, simbolo: "2" },
     TRES: { nombre: "Tres", valor: 3, simbolo: "3" },
