@@ -78,6 +78,20 @@ h1 {
   margin-bottom: 0.5em;
 }
 
+.cartaOculta {
+  height: fit-content;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border: 1px solid black;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: black;
+  color: black;
+}
+
 .carta {
   height: fit-content;
   padding-top: 10px;
@@ -92,12 +106,14 @@ h1 {
   color: black;
 }
 
-.carta div:first-child {
+.carta div:first-child,
+.cartaOculta div:first-child {
   font-size: 24px;
   font-weight: bold;
 }
 
-.carta div:last-child {
+.carta div:last-child,
+.cartaOculta div:last-child {
   font-size: 48px;
 }
 
@@ -359,12 +375,17 @@ select option {
   .juego .valor,
   .juego h2,
   .juego .resultado p,
-  #showRestablecer {
-    font-size: 300%;
-  }
-
+  #showRestablecer,
+  #ranking-panel h3,
+  #premios-panel h3,
+  #ranking-panel table td,
+  #premios-panel table td,
+  #message,
+  #restablecerMessage,
   .carta div:first-child,
-  .carta div:last-child {
+  .carta div:last-child,
+  .cartaOculta div:first-child,
+  .cartaOculta div:last-child {
     font-size: 300%;
   }
 
@@ -375,15 +396,6 @@ select option {
     left: auto;
     right: auto;
     padding-bottom: 2vh;
-  }
-
-  #ranking-panel h3,
-  #premios-panel h3,
-  #ranking-panel table td,
-  #premios-panel table td,
-  #message,
-  #restablecerMessage {
-    font-size: 300%;
   }
 
   #ranking-panel table,

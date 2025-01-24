@@ -1,4 +1,5 @@
 const palos = {
+    OCULTO: { nombre: "Oculto", simbolo: "🔳" },
     CORAZONES: { nombre: "Corazones", simbolo: "♥️" },
     DIAMANTES: { nombre: "Diamantes", simbolo: "♦️" },
     PICAS: { nombre: "Picas", simbolo: "♠️" },
@@ -6,6 +7,7 @@ const palos = {
 };
 
 const valores = {
+    OCULTO: { nombre: "Oculto", valor: 0, simbolo: "O" },
     AS: { nombre: "As", valor: 11, simbolo: "A" },
     DOS: { nombre: "Dos", valor: 2, simbolo: "2" },
     TRES: { nombre: "Tres", valor: 3, simbolo: "3" },
@@ -311,6 +313,15 @@ function actualizarJuego(juego) {
     });
     valorJugador.textContent = juego.valorJugador;
 
+    //Solo mostramos la primera carta del dealer
+    if (juego.activo) {
+        juego.manoIA.cartas.splice(1);
+        juego.valorIA = valores[juego.manoIA.cartas[0].valor].valor;
+        juego.manoIA.cartas.push({
+            "palo": "OCULTO",
+            "valor": "OCULTO"
+        });
+    }
     manoIA.innerHTML = '';
     juego.manoIA.cartas.forEach(carta => {
         const divCarta = document.createElement('div');
@@ -320,7 +331,7 @@ function actualizarJuego(juego) {
         divValor.textContent = valores[carta.valor].simbolo;
         divPalo.textContent = palos[carta.palo].simbolo;
 
-        divCarta.className = 'carta';
+        divCarta.className = carta.palo === "OCULTO" ? 'cartaOculta' : 'carta';
         divCarta.appendChild(divValor);
         divCarta.appendChild(divPalo);
         manoIA.appendChild(divCarta);
