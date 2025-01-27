@@ -142,8 +142,9 @@ public class BlackjackController {
                             default -> {
                             }
                         }
+                    } else {
+                        return ResponseEntity.ok(juego);
                     }
-                    return ResponseEntity.ok(juego);
                 } else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No tienes suficientes monedas");
                 }
