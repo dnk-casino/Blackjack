@@ -201,10 +201,26 @@ public class BlackjackController {
         if (usernameOpt.isPresent()) {
             Optional<Usuario> usuarioOpt = usuarioService.findByUsername(usernameOpt.get());
             if (usuarioOpt.isPresent()) {
+                Usuario usuario = usuarioOpt.get();
                 Optional<Juego> juegoOpt = juegoService.findById(id);
                 if (juegoOpt.isPresent()) {
                     if (juegoOpt.get().isActivo()) {
-                        return ResponseEntity.ok(juegoService.pedirCarta(id));
+                        Juego juego = juegoService.pedirCarta(id);
+                        if (!juego.isActivo()) {
+                            switch (juego.determinarGanador()) {
+                                case 0 -> {
+                                    usuarioService.cobrar(usuario.getId(), juego.getApuesta());
+                                }
+                                case 1 -> {
+                                    usuarioService.cobrar(usuario.getId(), (juego.getApuesta() * 2));
+                                    usuarioService.bjvictoria(usuario.getId());
+                                }
+                                default -> {
+                                }
+                            }
+                        } else {
+                            return ResponseEntity.ok(juego);
+                        }
                     } else {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La partida ya ha terminado");
                     }
