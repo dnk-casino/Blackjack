@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import dnk.casino.blackjack.Blackjack.Carta.Carta;
 import dnk.casino.blackjack.Blackjack.Carta.Valor;
 
 @Component

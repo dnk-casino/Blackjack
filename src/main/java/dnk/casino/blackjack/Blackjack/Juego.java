@@ -5,7 +5,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import dnk.casino.blackjack.Blackjack.Carta.Carta;
 import dnk.casino.blackjack.Blackjack.Carta.Palo;
 import dnk.casino.blackjack.Blackjack.Carta.Valor;
 
@@ -133,24 +132,25 @@ public class Juego {
     public int determinarGanador() {
         setActivo(false);
         if (getValorJugador() > 21) {
-            return 2;
+            return 2; // El jugador se pasó, gana la IA
         } else if (getValorIA() > 21) {
-            return 1;
-        } else if (getManoJugador().getCartas().size() > 2 && getManoIA().getCartas().size() == 2
-                && getValorIA() == 21) {
-            return 2;
-        } else if (getManoJugador().getCartas().size() == 2 && getManoIA().getCartas().size() == 2
-                && getValorJugador() == 21 && getValorIA() == 21) {
-            return 0;
-        } else if (getManoJugador().getCartas().size() == 2 && getManoIA().getCartas().size() > 2
-                && getValorJugador() == 21) {
-            return 1;
-        } else if (getValorJugador() > getValorIA()) {
-            return 1;
-        } else if (getValorJugador() < getValorIA()) {
-            return 2;
+            return 1; // La IA se pasó, gana el jugador
+        } else if (getValorIA() == 21 && getManoIA().getCartas().size() == 2) {
+            return 2; // La IA tiene un blackjack, gana
+        } else if (getValorJugador() == 21 && getManoJugador().getCartas().size() == 2) {
+            if (getValorIA() == 21 && getManoIA().getCartas().size() == 2) {
+                return 0; // Ambos tienen un blackjack, empate
+            } else {
+                return 1; // El jugador tiene un blackjack, gana
+            }
         } else {
-            return 0;
+            if (getValorJugador() > getValorIA()) {
+                return 1; // El jugador tiene un valor mayor, gana
+            } else if (getValorJugador() < getValorIA()) {
+                return 2; // La IA tiene un valor mayor, gana
+            } else {
+                return 0; // Empate
+            }
         }
     }
 }

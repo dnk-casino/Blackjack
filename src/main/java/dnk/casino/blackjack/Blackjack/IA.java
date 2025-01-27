@@ -2,8 +2,6 @@ package dnk.casino.blackjack.Blackjack;
 
 import org.springframework.stereotype.Component;
 
-import dnk.casino.blackjack.Blackjack.Carta.Carta;
-
 @Component
 public class IA {
     private Mano mano;
