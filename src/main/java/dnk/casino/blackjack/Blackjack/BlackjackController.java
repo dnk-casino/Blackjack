@@ -1,4 +1,4 @@
-package dnk.casino.blackjack;
+package dnk.casino.blackjack.Blackjack;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,9 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import dnk.casino.Users.JwtTokenUtil;
 import dnk.casino.Users.Usuario;
 import dnk.casino.Users.UsuarioService;
-import dnk.casino.blackjack.Blackjack.Juego;
-import dnk.casino.blackjack.Blackjack.JuegoService;
-import dnk.casino.blackjack.Blackjack.Ranking;
 
 @Controller
 public class BlackjackController {
