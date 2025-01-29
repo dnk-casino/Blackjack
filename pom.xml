@@ -45,6 +45,16 @@
 		<java.version>21</java.version>
 	</properties>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.apache.maven.plugin-tools</groupId>
+				<artifactId>maven-plugin-annotations</artifactId>
+				<version>3.15.1</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -77,7 +87,7 @@
 		<dependency>
 			<groupId>io.github.dnk-casino</groupId>
 			<artifactId>starter</artifactId>
-			<version>1.0.3</version>
+			<version>1.0.7</version>
 		</dependency>
 	</dependencies>
 
